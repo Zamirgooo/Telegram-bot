@@ -1,4 +1,3 @@
-
 import asyncio
 import os
 from dotenv import load_dotenv
@@ -23,6 +22,24 @@ dp = Dispatcher()
 async def command_start_handler(message: Message) -> None:
     await message.reply(f" Привет, {message.from_user.first_name}!")
 
+
+# Команда /info
+@dp.message(Command("info"))
+async def command_info_handler(message: Message) -> None:
+    user = message.from_user
+
+    info_text = (
+        f" Информация о пользователе:\n"
+        f" ID: {user.id}\n"
+        f" Имя: {user.first_name or 'Не указано'}\n"
+        f" Фамилия: {user.last_name or 'Не указано'}\n"
+        f" Username: @{user.username if user.username else 'Нет'}\n"
+        f" Язык: {user.language_code or 'Неизвестно'}\n"
+        f" Бот: {'Да' if user.is_bot else 'Нет'}"
+    )
+
+    await message.reply(info_text)
+
 # Команда /help
 @dp.message(Command("help"))
 async def command_help_handler(message: Message) -> None:
@@ -31,8 +48,11 @@ async def command_help_handler(message: Message) -> None:
         f" Автор: {CREATOR}\n\n"
         "Доступные команды:\n"
         "/start — начать\n"
-        "/help — информация"
+        "/help — информация\n"
+        "/info — информация о вас"
     )
+
+
 
 # Запуск бота
 async def main() -> None:

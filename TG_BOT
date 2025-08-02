@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
 from aiogram.types import Message
+from datetime import datetime
+from aiogram import F
 
 # Загружаем токен
 load_dotenv()
@@ -40,18 +42,46 @@ async def command_info_handler(message: Message) -> None:
 
     await message.reply(info_text)
 
+
+
+@dp.message(Command("about"))
+async def command_about_handler(message: Message) -> None:
+    await message.reply(
+        f" Я — Telegram-бот, созданный {CREATOR}.\n"
+        f"Дата создания: {CREATED_DATE}.\n"
+        "Я умею выполнять простые команды и сообщать информацию!"
+    )
+
+
+
+@dp.message(Command("time"))
+async def command_time_handler(message: Message) -> None:
+    now = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+    await message.reply(f" Текущее время: {now}")
+
+
+@dp.message()
+async def reverse_text_handler(message: Message) -> None:
+    # Если сообщение начинается с '/', это команда — игнорируем
+    if message.text.startswith("/"):
+        return
+
+    reversed_text = message.text[::-1]
+    await message.reply(f" Обратный текст:\n{reversed_text}")
+
 # Команда /help
 @dp.message(Command("help"))
 async def command_help_handler(message: Message) -> None:
     await message.reply(
         f" Этот бот был создан {CREATED_DATE}.\n"
         f" Автор: {CREATOR}\n\n"
-        "Доступные команды:\n"
-        "/start — начать\n"
-        "/help — информация\n"
-        "/info — информация о вас"
+        " Доступные команды:\n"
+        "/start — начать работу\n"
+        "/help — список команд\n"
+        "/info — информация о вас\n"
+        "/time — текущее время\n"
+        "/about — информация о боте"
     )
-
 
 
 # Запуск бота

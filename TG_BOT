@@ -1,12 +1,10 @@
 import asyncio
 import os
 from dotenv import load_dotenv
-
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message
 from datetime import datetime
-from aiogram import F
 
 # Загружаем токен
 load_dotenv()
@@ -24,12 +22,10 @@ dp = Dispatcher()
 async def command_start_handler(message: Message) -> None:
     await message.reply(f" Привет, {message.from_user.first_name}!")
 
-
 # Команда /info
 @dp.message(Command("info"))
 async def command_info_handler(message: Message) -> None:
     user = message.from_user
-
     info_text = (
         f" Информация о пользователе:\n"
         f" ID: {user.id}\n"
@@ -39,11 +35,9 @@ async def command_info_handler(message: Message) -> None:
         f" Язык: {user.language_code or 'Неизвестно'}\n"
         f" Бот: {'Да' if user.is_bot else 'Нет'}"
     )
-
     await message.reply(info_text)
 
-
-
+# Команда /about
 @dp.message(Command("about"))
 async def command_about_handler(message: Message) -> None:
     await message.reply(
@@ -52,22 +46,11 @@ async def command_about_handler(message: Message) -> None:
         "Я умею выполнять простые команды и сообщать информацию!"
     )
 
-
-
+# Команда /time
 @dp.message(Command("time"))
 async def command_time_handler(message: Message) -> None:
     now = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
     await message.reply(f" Текущее время: {now}")
-
-
-@dp.message()
-async def reverse_text_handler(message: Message) -> None:
-    # Если сообщение начинается с '/', это команда — игнорируем
-    if message.text.startswith("/"):
-        return
-
-    reversed_text = message.text[::-1]
-    await message.reply(f" Обратный текст:\n{reversed_text}")
 
 # Команда /help
 @dp.message(Command("help"))
@@ -83,6 +66,12 @@ async def command_help_handler(message: Message) -> None:
         "/about — информация о боте"
     )
 
+# Обратный текст (только если это не команда)
+@dp.message(F.text)
+async def reverse_text_handler(message: Message) -> None:
+    if message.text.startswith("/"):
+        return
+    await message.reply(f" Обратный текст:\n{message.text[::-1]}")
 
 # Запуск бота
 async def main() -> None:

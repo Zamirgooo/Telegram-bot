@@ -1,10 +1,17 @@
 import asyncio
 import os
+import random
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message
 from datetime import datetime
+from keyboards import keyboard_single_row
+
+
+
+
+
 
 # Загружаем токен
 load_dotenv()
@@ -20,7 +27,7 @@ dp = Dispatcher()
 # Команда /start
 @dp.message(Command("start"))
 async def command_start_handler(message: Message) -> None:
-    await message.reply(f" Привет, {message.from_user.first_name}!")
+    await message.reply(f" Привет, {message.from_user.first_name}!", reply_markup=keyboard_single_row)
 
 # Команда /info
 @dp.message(Command("info"))
@@ -46,6 +53,54 @@ async def command_about_handler(message: Message) -> None:
         "Я умею выполнять простые команды и сообщать информацию!"
     )
 
+
+@dp.message(Command("device"))
+async def device_guess(message: Message):
+    user = message.from_user
+    name = user.first_name.lower() if user.first_name else ""
+
+    # Предположение по ключевым словам в имени (чисто символически)
+    if any(x in name for x in ["iphone", "ios", "apple"]):
+        guess = "Ты точно с iPhone "
+    elif any(x in name for x in ["samsung", "galaxy"]):
+        guess = "Galaxy? Значит Samsung "
+    elif any(x in name for x in ["mi", "xiaomi", "redmi"]):
+        guess = "Пахнет MIUI — Xiaomi или Redmi?"
+    elif "huawei" in name:
+        guess = "Huawei? Китайская сила "
+    elif "realme" in name:
+        guess = "Realme — шустрый выбор "
+    elif any(x in name for x in ["pc", "notebook", "laptop", "windows", "linux", "mac"]):
+        guess = "Ты с ноутбука или ПК"
+    elif "nokia" in name:
+        guess = "Nokia... Надёжный как кирпич"
+    else:
+        guess = random.choice([
+            "Ты с неизвестного мне устройства ",
+            "Похоже, ты пользуешься кастомным телефоном ",
+            "Ты из будущего? Такое устройство мне не знакомо"
+        ])
+    
+    await message.reply(f" Я предполагаю: {guess}")
+
+
+@dp.message(F.video)
+async def video_info_handler(message: Message) -> None:
+    video = message.video
+    info_text = (
+        f" Информация о видео:\n"
+        f"File ID: `{video.file_id}`\n"
+        f"Unique ID: `{video.file_unique_id}`\n"
+        f"Ширина: {video.width}px\n"
+        f"Высота: {video.height}px\n"
+        f"Длительность: {video.duration} сек.\n"
+    )
+    await message.reply(info_text, parse_mode="Markdown")
+
+@dp.message(Command("video"))
+async def help_information(message: Message):
+    await message.answer_video('BAACAgIAAxkBAAPHaJBKklLDUu_KNXX9kAmeWT9G65IAApR-AAKQXYBIbly5UGKwFwk2BA')
+
 # Команда /time
 @dp.message(Command("time"))
 async def command_time_handler(message: Message) -> None:
@@ -63,7 +118,8 @@ async def command_help_handler(message: Message) -> None:
         "/help — список команд\n"
         "/info — информация о вас\n"
         "/time — текущее время\n"
-        "/about — информация о боте"
+        "/about — информация о боте\n"
+        "/device - информация о вашем телефоне"
     )
 
 # Обратный текст (только если это не команда)

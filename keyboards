@@ -1,0 +1,16 @@
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+
+# Кнопки с командами
+keyboard_single_row = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="/info")],
+        [KeyboardButton(text="/about")],
+        [KeyboardButton(text="/time")],
+        [KeyboardButton(text="/device")],
+        [KeyboardButton(text="/video")],
+        [KeyboardButton(text="/help")],
+        [KeyboardButton(text="/start")]
+    ],
+    resize_keyboard=True,
+    input_field_placeholder="Выберите команду"
+)
